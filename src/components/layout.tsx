@@ -9,10 +9,12 @@ export interface LayoutProps {
 const Layout: FunctionComponent<LayoutProps> = ({ main }) => {
   const authenticated = false;
 
+  const logout = () => console.log("logged out");
+
   return (
     <React.Fragment>
-      <div className="bg-gray-900 max-w-screen-2xl mx-auto text-white">
-        <nav className="bg-gray-800 h-16">
+      <div className="bg-gradient-to-tr from-indigo-800 to-blue-400 max-w-screen-2xl mx-auto text-white">
+        <nav className="bg-gray-800" style={{ height: "64px" }}>
           <div className="px-6 flex items-center justify-between h-16">
             <Link href="/">
               <a>
@@ -29,7 +31,7 @@ const Layout: FunctionComponent<LayoutProps> = ({ main }) => {
                 <Link href="/houses/add">
                   <a>Add House</a>
                 </Link>
-                <button onClick={() => {}}>Logout</button>
+                <button onClick={() => logout()}>Logout</button>
               </>
             ) : (
               <>
@@ -40,7 +42,7 @@ const Layout: FunctionComponent<LayoutProps> = ({ main }) => {
             )}
           </div>
         </nav>
-        {main}
+        <main style={{ minHeight: "calc(100vh - 64px)" }}> {main}</main>
       </div>
     </React.Fragment>
   );
