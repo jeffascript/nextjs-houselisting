@@ -1,15 +1,19 @@
 import React, { FunctionComponent, ReactNode } from "react";
 import Link from "next/link";
-// import { useAuth } from "src/auth/useAuth";
+import Image from "next/image";
+import { useAuth } from "src/auth/useAuth";
 
-export interface LayoutProps {
+export interface ILayoutProps {
   main: ReactNode;
 }
 
-const Layout: FunctionComponent<LayoutProps> = ({ main }) => {
-  const authenticated = false;
-
-  const logout = () => console.log("logged out");
+const Layout: FunctionComponent<ILayoutProps> = ({ main }) => {
+  const { logout, user, authenticated } = useAuth();
+  /****
+   * We now remove the placeholders we were using since we have context values
+   *   const authenticated = true;
+   *   const logout = () => null;
+   ****/
 
   return (
     <React.Fragment>
@@ -18,10 +22,15 @@ const Layout: FunctionComponent<LayoutProps> = ({ main }) => {
           <div className="px-6 flex items-center justify-between h-16">
             <Link href="/">
               <a>
-                <img
+                <Image
+                  //   placeholder="blur"
+                  //   blurDataURL="data:image/jpeg;base64,/9j/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                   src="/home-color.svg"
                   alt="home house"
                   className="inline-block w-6"
+                  width="20px"
+                  height="20px"
+                  //   layout="responsive"  // "fixed" | "intrinsic" | "responsive"
                 />
               </a>
             </Link>
