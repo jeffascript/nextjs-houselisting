@@ -11,6 +11,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const uid = await loadIdToken(req as NextApiRequest);
   // console.log({ uid });// to see the uid printed on the console
 
+  /**
+   * If there is a UID, move user to Home, he doesn't need the auth page shown
+   */
   if (uid) {
     res.setHeader("location", "/");
     res.statusCode = 302;
