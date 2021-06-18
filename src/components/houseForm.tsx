@@ -32,6 +32,8 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
     IFormData
   >({ defaultValues: {} });
 
+  const address = watch("address");
+
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
     register({ name: "latitude" }, { required: true, min: -90, max: 90 });
@@ -55,13 +57,15 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
         </label>
         <SearchBox
           onSelectAddress={(address, latitude, longitude) => {
-            setValue("address", address);
+            setValue("address", address); //setValue from react-hook-form and not usePlacesAutocomplete
             setValue("latitude", latitude);
             setValue("longitude", longitude);
           }}
           defaultValue=""
         />
         {errors.address && <p> {errors.address.message}</p>}
+        {/* WATCH IN ACTION */}
+        <h2>{address}</h2>
       </div>
     </form>
   );

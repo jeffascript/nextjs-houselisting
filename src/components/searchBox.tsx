@@ -1,5 +1,4 @@
 import { ChangeEvent } from "react";
-import { FunctionComponent } from "react";
 import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -25,7 +24,10 @@ export interface ISearchBoxProps {
 
 const libraries: Libraries = ["places"];
 
-const SearchBox = ({ onSelectAddress, defaultValue }: ISearchBoxProps) => {
+export const SearchBox = ({
+  onSelectAddress,
+  defaultValue,
+}: ISearchBoxProps) => {
   const { isLoaded, loadError } = useGoogleMapsScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "", //if null||undefined, return ""
 
@@ -35,10 +37,13 @@ const SearchBox = ({ onSelectAddress, defaultValue }: ISearchBoxProps) => {
   if (!isLoaded) return null;
   if (loadError) return <div>Error loading...</div>;
 
-  return <ReadySearchBox defaultValue={defaultValue} />;
+  return (
+    <ReadySearchBox
+      defaultValue={defaultValue}
+      onSelectAddress={onSelectAddress}
+    />
+  );
 };
-
-export default SearchBox;
 
 function ReadySearchBox({ onSelectAddress, defaultValue }: ISearchBoxProps) {
   const {
@@ -47,5 +52,49 @@ function ReadySearchBox({ onSelectAddress, defaultValue }: ISearchBoxProps) {
     setValue,
     suggestions: { status, data },
     clearSuggestions,
-  } = usePlacesAutocomplete({ debounce: 300, defaultValue });
+  } = usePlacesAutocomplete({ debounce: 300, defaultValue }); //setValue from usePlacesAutocomplete
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    if (e.target.value === "") {
+      onSelectAddress("", null, null);
+    }
+  };
+
+  const handleOnSelect = async (address: string) => {
+    setValue(address, false); //since setValue from usePlacesAutocomplete has another param, which is should fetch data
+    clearSuggestions();
+    try {
+      const [firstResult] = await getGeocode({ address }); //destructued results, to get first result
+      const { lat, lng } = await getLatLng(firstResult); //alterantively results[0] if I haven't destructred above
+      onSelectAddress(address, lat, lng);
+    } catch (err) {
+      console.error(`😤  Error: `, err);
+    }
+  };
+
+  // console.log({ status, data }); //OK && address is returned from this
+  return (
+    <Combobox onSelect={handleOnSelect}>
+      <ComboboxInput
+        // data={data}
+        id="search"
+        value={value}
+        onChange={handleChange}
+        disabled={!ready}
+        placeholder="Search your location ..."
+        className="w-full p-2"
+        autoComplete="off"
+      />
+
+      <ComboboxPopover>
+        <ComboboxList>
+          {status === "OK" &&
+            data.map(({ place_id, description }) => (
+              <ComboboxOption key={place_id} value={description} />
+            ))}
+        </ComboboxList>
+      </ComboboxPopover>
+    </Combobox>
+  );
 }

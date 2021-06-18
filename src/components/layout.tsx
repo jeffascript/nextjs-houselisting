@@ -17,6 +17,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ main }) => {
 
   return (
     <React.Fragment>
+      {/* text color and whole page theming done here */}
       <div className="bg-gradient-to-tr from-indigo-800 to-blue-400 max-w-screen-2xl mx-auto text-white">
         <nav className="bg-gray-800" style={{ height: "64px" }}>
           <div className="px-6 flex items-center justify-between h-16">
