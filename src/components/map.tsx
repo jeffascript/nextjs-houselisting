@@ -26,9 +26,9 @@ const Map: React.FC<IMapProps> = () => {
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         ref={(instance) => (mapRef.current = instance)} //store this instance of this map on the ref
-        minZoom={5}
+        minZoom={8}
         maxZoom={16}
-        mapStyle="mapbox://styles/jeffemerald/ckq0iiirc135u17p8d60mwvyw"
+        mapStyle="mapbox://styles/jeffemerald/ckq28ecdq1lfr17p9bwdsbhcu"
         // mapbox://styles/leighhalliday/ckhjaksxg0x2v19s1ovps41ef
       />
     </div>

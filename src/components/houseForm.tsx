@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 // import { useMutation, gql } from "@apollo/client";
 // import { useRouter } from "next/router";
-// import Link from "next/link";
+import Link from "next/link";
 // import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
 // import {
@@ -14,6 +14,7 @@ import { SearchBox } from "./searchBox";
 //   UpdateHouseMutationVariables,
 // } from "src/generated/UpdateHouseMutation";
 // import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
+import { FiUploadCloud } from "react-icons/fi";
 
 export interface IFormData {
   address: string;
@@ -28,6 +29,8 @@ export interface IHouseFormDataProps {}
 const HouseFormData: React.FC<IHouseFormDataProps> = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
+  const [previewImage, setPreviewImage] = useState<string>();
+
   const { register, handleSubmit, setValue, errors, watch } = useForm<
     IFormData
   >({ defaultValues: {} });
@@ -40,7 +43,9 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
     register({ name: "longitude" }, { required: true, min: -180, max: 180 });
   }, [register]);
 
-  const handleCreate = async (data: IFormData) => {};
+  const handleCreate = async (data: IFormData) => {
+    console.log("data", data);
+  };
 
   const onSubmit = (data: IFormData) => {
     setSubmitting(true);
@@ -66,6 +71,82 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
         {errors.address && <p> {errors.address.message}</p>}
         {/* WATCH IN ACTION */}
         <h2>{address}</h2>
+      </div>
+      <div className="mt-4">
+        <label
+          htmlFor="image"
+          className="p-4 border-dashed border-4 border-gray-600 block cursor-pointer"
+        >
+          <div className="flex flex-col justify-evenly items-center">
+            <FiUploadCloud />
+            <p> Click to Upload a file (16: 19)</p>
+            <small>PNG, JPG, GIF up to 10MB</small>
+          </div>
+        </label>
+
+        <input
+          type="file"
+          id="image"
+          name="image"
+          accept="image/*"
+          style={{ display: "none" }}
+          ref={register({
+            validate: (fileList: FileList) => {
+              if (fileList.length === 1) return true;
+              return "Please upload one file";
+            },
+          })}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (event?.target?.files?.[0]) {
+              const file = event.target.files[0];
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setPreviewImage(reader.result as string); //cast to string since we know it's a tpe of string
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+        />
+        {/* calculation; cos we dontknow what the height could be, but we are rendering based off on the alloted width */}
+        {previewImage && (
+          <img
+            src={previewImage}
+            className="mt-4 object-cover"
+            style={{ width: "576px", height: `${(9 / 16) * 576}px` }}
+          />
+        )}
+
+        {errors.image && <p> {errors.image.message} </p>}
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="bedrooms" className="block">
+          Beds
+        </label>
+        <input
+          type="number"
+          id="bedrooms"
+          name="bedrooms"
+          className="p-2"
+          ref={register({
+            required: "Please enter the number of bedrooms",
+            max: { value: 10, message: "Woooah, too big of a house" },
+            min: { value: 1, message: "Must have at least 1 bedroom" },
+          })}
+        />
+        {errors.bedrooms && <p> {errors.bedrooms.message} </p>}
+      </div>
+      <div className="mt-4">
+        <button
+          className="bg-green-500 hover:bg-green-700 font-bold py-2 px-4 rounded"
+          type="submit"
+          disabled={submitting}
+        >
+          Save
+        </button>{" "}
+        <Link href="/">
+          <a>Cancel</a>
+        </Link>
       </div>
     </form>
   );
