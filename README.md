@@ -32,7 +32,7 @@ yarn start
 
 [ ] - restyle the signin firebaseui with global css reset (firebaseAuth.tsx)
 
-[ ] - populate postgres with data from listing API Berlin.
+[ ] - seed postgres with data from listing API/ Json Berlin -- Maybe Zillow.
 
 [ ] - Styling for Darkmode and lightmode
 
