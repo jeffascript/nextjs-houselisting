@@ -1,9 +1,9 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
-// import { useMutation, gql } from "@apollo/client";
+import { useMutation, gql } from "@apollo/client";
 // import { useRouter } from "next/router";
 import Link from "next/link";
-// import { Image } from "cloudinary-react";
+import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
 // import {
 //   CreateHouseMutation,
@@ -13,8 +13,17 @@ import { SearchBox } from "./searchBox";
 //   UpdateHouseMutation,
 //   UpdateHouseMutationVariables,
 // } from "src/generated/UpdateHouseMutation";
-// import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
+import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
 import { FiUploadCloud } from "react-icons/fi";
+
+const SIGNATURE_MUTATION = gql`
+  mutation CreateSignatureMutation {
+    createImageSignature {
+      signature
+      timestamp
+    }
+  }
+`;
 
 export interface IFormData {
   address: string;
@@ -23,6 +32,30 @@ export interface IFormData {
   bedrooms: string;
   image: FileList;
 }
+
+export interface IUploadImageResponse {
+  secure_url: string;
+}
+
+const uploadImage = async (
+  image: File,
+  signature: string,
+  timestamp: number
+): Promise<IUploadImageResponse> => {
+  const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
+  const formData = new FormData();
+  formData.append("file", image);
+  formData.append("signature", signature);
+  formData.append("timestamp", timestamp.toString());
+  formData.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_KEY ?? ""); //if null, display "", coerce it to know it expects string
+
+  const response = await fetch(url, {
+    method: "post",
+    body: formData,
+  });
+
+  return response.json();
+};
 
 export interface IHouseFormDataProps {}
 
@@ -37,6 +70,10 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
 
   const address = watch("address");
 
+  const [createSignature] = useMutation<CreateSignatureMutation>(
+    SIGNATURE_MUTATION
+  );
+
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
     register({ name: "latitude" }, { required: true, min: -90, max: 90 });
@@ -44,7 +81,17 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
   }, [register]);
 
   const handleCreate = async (data: IFormData) => {
-    console.log("data", data);
+    // console.log("data", data);
+    const { data: signatureData } = await createSignature(); //data:signatureData just to tweak it since there is another data from props, hence it adopts the main prop passed in to mutate
+    if (signatureData) {
+      const { signature, timestamp } = signatureData.createImageSignature;
+      const imageData = await uploadImage(data.image[0], signature, timestamp);
+      // console.log(imageData);
+      /**
+       * the url we are interested, returned from the response which we have declared the interface with IUploadImageResponse
+       */
+      const imageUrl = imageData.secure_url;
+    }
   };
 
   const onSubmit = (data: IFormData) => {
