@@ -1,14 +1,14 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
-// import {
-//   CreateHouseMutation,
-//   CreateHouseMutationVariables,
-// } from "src/generated/CreateHouseMutation";
+import {
+  CreateHouseMutation,
+  CreateHouseMutationVariables,
+} from "src/generated/CreateHouseMutation";
 // import {
 //   UpdateHouseMutation,
 //   UpdateHouseMutationVariables,
@@ -25,11 +25,19 @@ const SIGNATURE_MUTATION = gql`
   }
 `;
 
+const CREATE_HOUSE_MUTATION = gql`
+  mutation CreateHouseMutation($input: HouseInput!) {
+    createHouse(input: $input) {
+      id
+    }
+  }
+`;
+
 export interface IFormData {
   address: string;
   latitude: number;
   longitude: number;
-  bedrooms: number; //number
+  bedrooms: string; //number
   image: FileList;
 }
 
@@ -59,7 +67,8 @@ const uploadImage = async (
 
 export interface IHouseFormDataProps {}
 
-const HouseFormData: React.FC<IHouseFormDataProps> = () => {
+export default function HouseFormData({}: IHouseFormDataProps) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const [previewImage, setPreviewImage] = useState<string>();
@@ -80,17 +89,45 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
     register({ name: "longitude" }, { required: true, min: -180, max: 180 });
   }, [register]);
 
+  const [createHouse] = useMutation<
+    CreateHouseMutation,
+    CreateHouseMutationVariables
+  >(CREATE_HOUSE_MUTATION);
+
   const handleCreate = async (data: IFormData) => {
-    // console.log("data", data);
+    // console.log("dataIformData", data);
     const { data: signatureData } = await createSignature(); //data:signatureData just to tweak it since there is another data from props, hence it adopts the main prop passed in to mutate
     if (signatureData) {
+      // console.log("signatureData", data);
       const { signature, timestamp } = signatureData.createImageSignature;
       const imageData = await uploadImage(data.image[0], signature, timestamp);
       // console.log(imageData);
       /**
        * the url we are interested, returned from the response which we have declared the interface with IUploadImageResponse
        */
-      const imageUrl = imageData.secure_url;
+      const imageSecureUrl = imageData.secure_url;
+
+      //houseData just to tweak the data here to have the props of createHouse mutation
+      const { data: houseData } = await createHouse({
+        variables: {
+          input: {
+            address: data.address,
+            image: imageSecureUrl,
+            coordinates: {
+              latitude: data.latitude,
+              longitude: data.longitude,
+            },
+            bedrooms: parseInt(data.bedrooms, 10), //parse string to int base 10
+          },
+        },
+      });
+
+      if (houseData?.createHouse) {
+        // console.log("houseData", data);
+        router.push(`/houses/${houseData.createHouse.id}`);
+      } else {
+        throw new Error("Error with mutation"); // this should not get here, considering that errors have been handled before this point
+      }
     }
   };
 
@@ -201,6 +238,4 @@ const HouseFormData: React.FC<IHouseFormDataProps> = () => {
       ) : null}
     </form>
   );
-};
-
-export default HouseFormData;
+}

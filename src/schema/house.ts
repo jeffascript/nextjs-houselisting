@@ -81,7 +81,7 @@ export class HouseResolver {
   @Authorized()
   @Mutation((_returns) => House, { nullable: true })
   async createHouse(
-    @Arg("input") input: HouseInput,
+    @Arg("input") input: HouseInput, //params to be added, input is the param placeholder...check houseform.tsx l.29
     @Ctx() ctx: AuthorizedContext
   ) {
     return await ctx.prisma.house.create({
