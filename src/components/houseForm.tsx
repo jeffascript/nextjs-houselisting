@@ -29,7 +29,7 @@ export interface IFormData {
   address: string;
   latitude: number;
   longitude: number;
-  bedrooms: string;
+  bedrooms: number; //number
   image: FileList;
 }
 
