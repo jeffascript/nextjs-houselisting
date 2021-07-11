@@ -7,7 +7,7 @@ import { authChecker } from "./auth";
 class DummyResolver {
   @Query((_returns) => String)
   hello() {
-    return "Nice to meet you!";
+    return "Nice to meet you - Demo!!!";
   }
 }
 
