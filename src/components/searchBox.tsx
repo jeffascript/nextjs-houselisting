@@ -35,7 +35,7 @@ export const SearchBox = ({
   });
 
   if (!isLoaded) return null;
-  if (loadError) return <div>Error loading...</div>;
+  if (loadError) return <div>... Error Loading ...</div>;
 
   return (
     <ReadySearchBox

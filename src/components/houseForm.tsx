@@ -138,7 +138,7 @@ export default function HouseFormData({}: IHouseFormDataProps) {
 
   return (
     <form className="mx-auto max-w-xl py-4 " onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl">Add a New House</h1>
+      <h1 className="text-xl">Add A New House</h1>
 
       <div className="mt-4">
         <label htmlFor="search" className="block">
