@@ -82,7 +82,7 @@ function ReadySearchBox({ onSelectAddress, defaultValue }: ISearchBoxProps) {
         value={value}
         onChange={handleChange}
         disabled={!ready}
-        placeholder="Search your location ..."
+        placeholder="Search for your location ..."
         className="w-full p-2"
         autoComplete="off"
       />
