@@ -20,7 +20,7 @@
     "@reach/combobox": "^0.11.2",
     "apollo-server-micro": "^2.19.0",
     "autoprefixer": "^10.0.2",
-    "class-validator": "^0.12.2",
+    "class-validator": "^0.14.0",
     "cloudinary": "^1.23.0",
     "cloudinary-react": "^1.6.7",
     "deepmerge": "^4.2.2",
